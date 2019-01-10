@@ -55,3 +55,9 @@
 
 * 具体可以见app/src/MainActivity.java
 
+* 思路
+  1.  得到recyclerView的可以滑动的距离totalRange.
+  2.  获取第一次加载时候recyclerView最后一个可见item距离屏幕左边的距离startRange.
+  3. 算出占比pre = startRange/totalRange .
+  4. 然后算初始长度 preValue= pre * (自定义滚动条的宽度 total).
+  5. 最后设置recyclerView的滚动监听, 动态改变滚动条的setTranslationX(  .... )
