@@ -1,6 +1,6 @@
 # recyclerView 水平进度条
 
-![](/Users/shb/Desktop/Screenshot_1547104964.png)
+![](../HorizontalView/shot/Screenshot_1547104964.png)
 
 * Xml代码
 
