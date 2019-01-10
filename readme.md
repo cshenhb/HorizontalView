@@ -1,4 +1,4 @@
-# recyclerView 水平进度条 类似淘宝首页水平滚动条.
+# recyclerView 水平滚动条 类似淘宝首页水平滚动条.
 
 ![](https://github.com/cshenhb/HorizontalView/blob/master/shot/Screenshot_1547104964.png)
 
