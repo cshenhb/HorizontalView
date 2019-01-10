@@ -1,6 +1,8 @@
 # recyclerView 水平进度条
 
-[](https://github.com/cshenhb/HorizontalView/blob/master/shot/Screenshot_1547104964.png)
+![](https://github.com/cshenhb/HorizontalView/blob/master/shot/Screenshot_1547104964.png)
+
+
 
 * Xml代码
 
