@@ -2,10 +2,14 @@ package com.shb.github.horizontalview.view;
 
 import android.content.Context;
 import android.graphics.Color;
+import android.support.annotation.NonNull;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.View;
+import android.view.ViewTreeObserver;
 
 import java.math.BigDecimal;
 
@@ -91,6 +95,54 @@ public class HorizontalView extends View {
 
 
         this.setTranslationX(startX);
+    }
+
+
+    public void bindRecyclerView(RecyclerView recyclerView) {
+        if (recyclerView == null) {
+            throw new NullPointerException("null");
+        }
+        if (recyclerView.getLayoutManager() instanceof LinearLayoutManager && ((LinearLayoutManager) recyclerView.getLayoutManager()).getOrientation() != LinearLayoutManager.HORIZONTAL) {
+            throw new IllegalArgumentException("必须是水平方向的LayoutManger");
+        }
+
+        initListener(recyclerView);
+        initArags(recyclerView);
+
+
+    }
+
+    private void initArags(final RecyclerView recyclerView) {
+        recyclerView.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+            @Override
+            public void onGlobalLayout() {
+                recyclerView.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+                try {
+                    int startRange = recyclerView.getChildAt(recyclerView.getChildCount() - 1).getRight();
+                    int totalRange = recyclerView.computeHorizontalScrollRange();
+                    setRange(startRange, totalRange);
+                    Log.i(TAG, "onScrolled: starRange: " + startRange + " scrollRange: " + startRange);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+    }
+
+    private void initListener(RecyclerView recyclerView) {
+        recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
+                super.onScrolled(recyclerView, dx, dy);
+                startX(dx);
+            }
+        });
+    }
+
+    @Override
+    protected void onDetachedFromWindow() {
+        super.onDetachedFromWindow();
+
     }
 
 

@@ -16,6 +16,7 @@
 
     </android.support.v7.widget.RecyclerView>
 
+    <!--这个width 就是绿色的背景,可以根据需求自定义  height也一样-->
     <LinearLayout
         android:background="@color/colorPrimaryDark"
         android:layout_width="100dp"
@@ -23,6 +24,8 @@
         android:layout_gravity="center"
         >
 
+        <!--这个width 就是红色的部分,随意定义,在onMesure 会根据recyclerView 的可以滑动的距离动态计算,
+          height应该和父布局的高度一样-->
         <com.shb.github.horizontalview.view.HorizontalView
             android:id="@+id/horView"
             android:layout_width="50dp"
