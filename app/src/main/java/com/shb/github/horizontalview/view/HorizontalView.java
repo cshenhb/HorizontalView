@@ -17,19 +17,22 @@ public class HorizontalView extends View {
     private static final String TAG = "HorizontalView";
     private float startX;
     private float total;
+    //初始值
     private float preValue;
+    //百分比
+    private float percentage;
 
     public float getStartRange() {
         return startRange;
     }
 
-    public float getTotalRange() {
-        return totalRange;
+    public float getScrollRange() {
+        return scrollRange;
     }
 
     public void setRange(float startRange, float totalRange) {
         this.setStartRange(startRange);
-        this.setTotalRange(totalRange);
+        this.setScrollRange(totalRange);
         requestLayout();
     }
 
@@ -37,12 +40,12 @@ public class HorizontalView extends View {
         this.startRange = startRange;
     }
 
-    public void setTotalRange(float totalRange) {
-        this.totalRange = totalRange;
+    public void setScrollRange(float totalRange) {
+        this.scrollRange = totalRange;
     }
 
     private float startRange;
-    private float totalRange = 1;
+    private float scrollRange;
 
     public HorizontalView(Context context) {
         this(context, null);
@@ -70,6 +73,9 @@ public class HorizontalView extends View {
         total = TypedValue
                 .applyDimension(TypedValue.COMPLEX_UNIT_PX, total, getContext().getResources().getDisplayMetrics());
 
+
+
+/*
         BigDecimal bigDecimal1 = new BigDecimal(getStartRange());
         BigDecimal bigDecimal2 = new BigDecimal(getTotalRange());
         BigDecimal bigDecimal3 = new BigDecimal(total);
@@ -78,8 +84,10 @@ public class HorizontalView extends View {
         preValue = bigDecimal1.divide(bigDecimal2, 3, BigDecimal.ROUND_HALF_EVEN).multiply(bigDecimal3).floatValue();
 
         Log.i(TAG, "onMeasure: pre: " + (getStartRange() / getTotalRange()));
-        Log.i(TAG, "onMeasure: total: " + total + "   preValue: " + preValue + " startRange: " + getStartRange() + " totalRange: " + getTotalRange());
+        Log.i(TAG, "onMeasure: total: " + total + "   preValue: " + preValue + " startRange: " + getStartRange() + " totalRange: " + getTotalRange());*/
 
+        preValue = percentage * total;
+        Log.i(TAG, "onMeasure: preValue: " + preValue);
         int v = (int) (TypedValue
                 .applyDimension(TypedValue.COMPLEX_UNIT_PX, preValue, getContext().getResources().getDisplayMetrics()) + 0.5f);
         int v1 = (int) (TypedValue
@@ -88,10 +96,23 @@ public class HorizontalView extends View {
     }
 
     public void startX(int x) {
-        BigDecimal bigDecimal1 = new BigDecimal(x);
-        BigDecimal bigDecimal2 = new BigDecimal(getTotalRange());
 
-        startX = startX + (bigDecimal1.divide(bigDecimal2, 3, BigDecimal.ROUND_HALF_EVEN).floatValue() * (total));
+
+        // 滑动的距离/总的
+        float pre = div(x, scrollRange + startRange, 3);
+        // pre = x(滑动的距离)/total;
+
+        float nextX = pre * (total);
+
+        startX = startX + nextX;
+
+        if (startX < 0) {
+            startX = 0;
+        }
+
+        if (startX > total - preValue) {
+            startX = total - preValue;
+        }
 
 
         this.setTranslationX(startX);
@@ -104,6 +125,10 @@ public class HorizontalView extends View {
         }
         if (recyclerView.getLayoutManager() instanceof LinearLayoutManager && ((LinearLayoutManager) recyclerView.getLayoutManager()).getOrientation() != LinearLayoutManager.HORIZONTAL) {
             throw new IllegalArgumentException("必须是水平方向的LayoutManger");
+        }
+
+        if (recyclerView.getAdapter() == null) {
+            throw new NullPointerException("null");
         }
 
         initListener(recyclerView);
@@ -119,15 +144,31 @@ public class HorizontalView extends View {
                 recyclerView.getViewTreeObserver().removeOnGlobalLayoutListener(this);
                 try {
                     int startRange = recyclerView.getChildAt(recyclerView.getChildCount() - 1).getRight();
-                    int totalRange = recyclerView.computeHorizontalScrollRange();
-                    setRange(startRange, totalRange);
-                    Log.i(TAG, "onScrolled: starRange: " + startRange + " scrollRange: " + startRange);
+                    int scrollRange = recyclerView.computeHorizontalScrollRange() - startRange;
+                    setRange(startRange, scrollRange);
+                    percentage = div(startRange, startRange + scrollRange, 3);
+                    Log.i(TAG, "onScrolled: starRange: " + startRange + " scrollRange: " + scrollRange + "  percentage: " + percentage + "  " + recyclerView.getWidth());
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
             }
         });
     }
+
+
+    public static float div(float v1, float v2, int scale) {
+        if (scale < 0) {
+            throw new IllegalArgumentException(
+                    "The scale must be a positive integer or zero");
+        }
+        if (v2 <= 0) {
+            return 0;
+        }
+        BigDecimal b1 = new BigDecimal(v1);
+        BigDecimal b2 = new BigDecimal(v2);
+        return b1.divide(b2, scale, BigDecimal.ROUND_HALF_EVEN).floatValue();
+    }
+
 
     private void initListener(RecyclerView recyclerView) {
         recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
